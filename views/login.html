@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📦 ServeAPI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --background: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-secondary: #94a3b8;
+      --input-bg: #334155;
+      --input-focus: #3b82f6;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background-image: 
+        radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(239, 68, 68, 0.1) 0%, transparent 50%);
+    }
+
+    .container {
+      background: var(--card-bg);
+      padding: 2.5rem;
+      border-radius: 1.25rem;
+      width: 380px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .logo svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: var(--text);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.25rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.9375rem;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    input::placeholder {
+      color: #64748b;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.875rem;
+      background: var(--primary);
+      border: none;
+      border-radius: 0.5rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 1.5rem 0 1rem;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    button[type="submit"]:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    button[type="submit"]:active {
+      transform: translateY(0);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 1.5rem 0;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #334155;
+    }
+
+    .divider::before {
+      margin-right: 1rem;
+    }
+
+    .divider::after {
+      margin-left: 1rem;
+    }
+
+    .toggle {
+      text-align: center;
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+    }
+
+    .toggle a {
+      color: var(--primary);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .toggle a:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .form-footer {
+      margin-top: 1.5rem;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .form-footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-footer a:hover {
+      color: var(--primary);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-animate {
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .container {
+        width: 90%;
+        padding: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="login-form" class="form-animate">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--primary)">
+          <path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.032a.75.75 0 00.372-.648V7.93zM11.25 22.18v-9l-9-5.25v8.57a.75.75 0 00.372.648l8.628 5.033z" />
+        </svg>
+      </div>
+      <h2>Welcome back</h2>
+      
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <div class="password-container">
+          <input type="password" id="login-password" placeholder="••••••••" required />
+          <button type="button" class="toggle-password">👁️</button>
+        </div>
+      </div>
+      
+      <button type="submit">Sign in</button>
+      
+      <div class="toggle">
+        Don't have an account? <a onclick="toggleForm()">Sign up</a>
+      </div>
+      
+      <div class="form-footer">
+        <a href="#">Forgot password?</a>
+      </div>
+    </form>
+
+    <form id="register-form" class="hidden">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--primary)">
+          <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z" />
+        </svg>
+      </div>
+      <h2>Create account</h2>
+      
+      <div class="form-group">
+        <label for="register-username">Username</label>
+        <input type="text" id="register-username" placeholder="username" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="register-email">Email</label>
+        <input type="email" id="register-email" placeholder="you@example.com" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="register-password">Password</label>
+        <div class="password-container">
+          <input type="password" id="register-password" placeholder="••••••••" required />
+          <button type="button" class="toggle-password">👁️</button>
+        </div>
+      </div>
+      
+      <button type="submit">Sign up</button>
+      
+      <div class="toggle">
+        Already have an account? <a onclick="toggleForm()">Sign in</a>
+      </div>
+      
+      <div class="form-footer">
+        By signing up, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function toggleForm() {
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      
+      // Add animation classes
+      if (loginForm.classList.contains('hidden')) {
+        loginForm.classList.remove('hidden');
+        loginForm.classList.add('form-animate');
+        registerForm.classList.add('hidden');
+      } else {
+        registerForm.classList.remove('hidden');
+        registerForm.classList.add('form-animate');
+        loginForm.classList.add('hidden');
+      }
+      
+      // Remove animation class after animation completes
+      setTimeout(() => {
+        loginForm.classList.remove('form-animate');
+        registerForm.classList.remove('form-animate');
+      }, 400);
+    }
+    
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(button => {
+      button.addEventListener('click', function() {
+        const input = this.parentElement.querySelector('input');
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        this.textContent = type === 'password' ? '👁️' : '🔒';
+      });
+    });
+    
+    // Form submission handling
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Add your login logic here
+      console.log('Login submitted');
+    });
+    
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Add your registration logic here
+      console.log('Register submitted');
+    });
+  </script>
+</body>
+</html>

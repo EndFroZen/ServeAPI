@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServeAPI | JSON Data Manager</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --error: #f72585;
+      --warning: #f8961e;
+      --text: #2b2d42;
+      --border-radius: 8px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7ff;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    
+    h1 {
+      font-size: 2.2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      color: #6c757d;
+      font-size: 1.1rem;
+    }
+    
+    .card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 1.8rem;
+      margin-bottom: 2rem;
+    }
+    
+    .card-title {
+      font-size: 1.3rem;
+      margin-bottom: 1.2rem;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+    
+    #jsonInput {
+      width: 100%;
+      min-height: 180px;
+      padding: 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: var(--border-radius);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+      resize: vertical;
+      transition: border 0.3s;
+    }
+    
+    #jsonInput:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .btn {
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      flex: 1;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #3d8de0;
+      transform: translateY(-1px);
+    }
+    
+    .status {
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+    
+    .status-success {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+      border-left: 4px solid var(--success);
+    }
+    
+    .status-error {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--error);
+      border-left: 4px solid var(--error);
+    }
+    
+    .status-warning {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--warning);
+      border-left: 4px solid var(--warning);
+    }
+    
+    .file-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    
+    .file-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 1.2rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+      border: 1px solid #e9ecef;
+    }
+    
+    .file-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .file-name {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--secondary);
+      word-break: break-word;
+    }
+    
+    .file-url {
+      font-size: 0.85rem;
+      color: #6c757d;
+      word-break: break-all;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .file-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .action-btn {
+      padding: 0.5rem 0.8rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .copy-btn:hover {
+      background: var(--primary-dark);
+    }
+    
+    .delete-btn {
+      background: var(--error);
+      color: white;
+    }
+    
+    .delete-btn:hover {
+      background: #e5177b;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #6c757d;
+      grid-column: 1 / -1;
+    }
+    
+    .confirmation-dialog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .confirmation-dialog.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .dialog-content {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1.5rem;
+      }
+      
+      .file-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>ServeAPI</h1>
+    <p class="subtitle">Manage and interact with your JSON data</p>
+  </header>
+  
+  <div class="card">
+    <h2 class="card-title">JSON Editor</h2>
+    <textarea id="jsonInput" placeholder='{
+  "name": "John Doe",
+  "age": 30,
+  "email": "john@example.com",
+  "is_active": true,
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown"
+  }
+}'></textarea>
+    
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="formatJson()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        Format JSON
+      </button>
+      <button class="btn btn-primary" onclick="submitData()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+        </svg>
+        Submit Data
+      </button>
+    </div>
+    
+    <div id="statusMessage"></div>
+  </div>
+  
+  <div class="card">
+    <h2 class="card-title">Your Files</h2>
+    <div class="file-list" id="fileList">
+      <!-- Files will be loaded here -->
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Dialog -->
+  <div class="confirmation-dialog" id="confirmationDialog">
+    <div class="dialog-content">
+      <h3>Confirm Deletion</h3>
+      <p>Are you sure you want to delete this file? This action cannot be undone.</p>
+      <div class="dialog-actions">
+        <button class="action-btn" onclick="cancelDelete()">Cancel</button>
+        <button class="action-btn delete-btn" onclick="confirmDelete()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentFileToDelete = null;
+    let currentDeleteUrl = null;
+    
+    document.addEventListener('DOMContentLoaded', loadFiles);
+    
+    async function loadFiles() {
+      try {
+        const response = await fetch("http://127.0.0.1:5662/getapi");
+        if (!response.ok) throw new Error("Failed to load files");
+        
+        const data = await response.json();
+        const fileList = document.getElementById("fileList");
+        fileList.innerHTML = "";
+        
+        if (Array.isArray(data.get) && data.get.length > 0) {
+          data.get.forEach(file => {
+            const fileCard = document.createElement("div");
+            fileCard.className = "file-card";
+            
+            fileCard.innerHTML = `
+              <div class="file-name">${file.filename}</div>
+              <a href="${file.link}" target="_blank" class="file-url">${file.link}</a>
+              <div class="file-actions">
+                <button class="action-btn copy-btn" data-link="${file.link}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  Copy
+                </button>
+                <button class="action-btn delete-btn" data-filename="${file.filename}" data-delete-url="${file.delete}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                  Delete
+                </button>
+              </div>
+            `;
+            
+            fileList.appendChild(fileCard);
+          });
+          
+          // Add event listeners to all copy buttons
+          document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              e.preventDefault();
+              try {
+                await navigator.clipboard.writeText(btn.dataset.link);
+                showStatus('Link copied to clipboard!', 'success');
+              } catch (err) {
+                showStatus('Failed to copy: ' + err, 'error');
+              }
+            });
+          });
+          
+          // Add event listeners to all delete buttons
+          document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              currentFileToDelete = btn.dataset.filename;
+              currentDeleteUrl = btn.dataset.deleteUrl;
+              showDeleteConfirmation();
+            });
+          });
+        } else {
+          fileList.innerHTML = `
+            <div class="empty-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6c757d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <p>No files available</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        showStatus("Error loading files: " + error.message, 'error');
+      }
+    }
+    
+    function formatJson() {
+      const input = document.getElementById("jsonInput");
+      try {
+        const json = JSON.parse(input.value);
+        input.value = JSON.stringify(json, null, 2);
+        showStatus("JSON formatted successfully", 'success');
+      } catch (error) {
+        showStatus("Invalid JSON: " + error.message, 'error');
+      }
+    }
+    
+    async function submitData() {
+      const input = document.getElementById("jsonInput");
+      const jsonString = input.value.trim();
+      
+      if (!jsonString) {
+        showStatus("Please enter JSON data", 'error');
+        return;
+      }
+      
+      try {
+        JSON.parse(jsonString); // Validate JSON
+      } catch (error) {
+        showStatus("Invalid JSON: " + error.message, 'error');
+        return;
+      }
+      
+      try {
+        showStatus("Submitting data...", 'success');
+        
+        const response = await fetch("http://127.0.0.1:5662/postapi", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ raw: jsonString })
+        });
+        
+        if (response.ok) {
+          showStatus("Data submitted successfully!", 'success');
+          setTimeout(loadFiles, 1000);
+        } else {
+          throw new Error("Server returned an error");
+        }
+      } catch (error) {
+        showStatus("Submission failed: " + error.message, 'error');
+      }
+    }
+    
+    function showDeleteConfirmation() {
+      document.getElementById('confirmationDialog').classList.add('active');
+    }
+    
+    function cancelDelete() {
+      document.getElementById('confirmationDialog').classList.remove('active');
+      currentFileToDelete = null;
+      currentDeleteUrl = null;
+    }
+    
+    async function confirmDelete() {
+      if (!currentFileToDelete || !currentDeleteUrl) return;
+      
+      try {
+        showStatus("Deleting file...", 'warning');
+        
+        const response = await fetch(currentDeleteUrl, {
+          method: "GET" // Assuming your delete endpoint uses GET
+        });
+        
+        if (response.ok) {
+          showStatus("File deleted successfully", 'success');
+          document.getElementById('confirmationDialog').classList.remove('active');
+          setTimeout(loadFiles, 1000);
+        } else {
+          throw new Error("Failed to delete file");
+        }
+      } catch (error) {
+        showStatus("Deletion failed: " + error.message, 'error');
+      } finally {
+        currentFileToDelete = null;
+        currentDeleteUrl = null;
+      }
+    }
+    
+    function showStatus(message, type) {
+      const statusElement = document.getElementById("statusMessage");
+      statusElement.className = `status status-${type}`;
+      statusElement.textContent = message;
+    }
+  </script>
+</body>
+</html>
